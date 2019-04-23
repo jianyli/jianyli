@@ -1,1 +1,179 @@
-<H1>欢迎</H1>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>歌单</title>
+		<link rel="stylesheet" type="text/css" href="css_files/song_sheet.css" />
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+	</head>
+	<body>
+		<div>
+			<header>
+				
+				<div class="f_guide">
+					<div class="f_guide_1">
+						<div class="img_logo">
+							<img src="img/logo6.PNG" height=80px/>
+						</div>
+						<div class="s_guide">
+							<div>
+								<a class="guides_settings" href="#">
+									<span>
+										歌曲
+									</span>
+								</a>
+							</div>
+						</div>
+						<div class="s_guide">
+							<div>
+								<a class="guides_settings" href="#">
+									<span>歌手</span>
+								</a>
+							</div>
+						</div>
+						<div class="s_guide">
+							<div>
+								<a class="songSsheet" href="#">
+									<span>歌单</span>
+								</a>
+							</div>
+						</div>
+						<div class="s_guide">
+							<div>
+								<a class="guides_settings" href="#">
+									<span>故事站</span>
+								</a>
+							</div>
+						</div>
+						<div class="s_guide">
+							<div>
+								<span id="search">
+									<input type="text" placeholder="  搜索歌曲，歌手，歌单  "/>
+								</span>
+							</div>
+						</div>
+						<div class="s_guide">
+							<div class="login_text">
+								<a class="login_guide guides_settings" href="javascript:void(0)" >
+									<span>登录/注册</span>
+								</a>
+								
+							</div>
+							<div class="login">
+								<form class="login_form" id="login_form">
+									<br />
+									昵称:<input type="text" name="username" size="20"/><br />
+									密码:<input type="password" name="password" size="20" /><br /><br />
+									<div class="button">
+										<a class="button_login" href="">
+											<span>登录</span>
+										</a>
+										<a href="">
+											<span>注册</span>
+										</a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+		</div>
+		<article>
+			<script type="text/javascript">
+				
+				$(function(){
+					$.ajax({
+						url:"file/song_sheet_info.txt",
+						type: "get",
+        				dataType: "jsonp",
+        				jsonp: "jsonpCallback",
+		          		scriptCharset: 'GBK',//解决中文乱码
+        				success: function (data) {
+        					console.log("成功");
+            				var arr=data.split("\n");
+							var l=1;
+							for(var i=0;i<16;i++){
+								if(i%16==0){
+									var $ul=$("<ul class='ul"+l+"' name='"+l+"'></ul>");
+									l++;
+									$(".songSheetInfo").append($ul);
+									$ul.show();
+								}
+								
+								var arr1=arr[i].split("\t");
+								var $li=$("<li><img src='"+arr1[1]+"' /><div><a target='_blank' onclick='nextWebPage(this)' class='descript_song' title='"+arr1[2]+"' name='"+arr1[0]+"' href='songBySheet.html'><div>"+arr1[2]+"</div></a></div><div>by:<a title='"+arr1[4]+"' href='"+arr1[5]+"'>"+arr1[4]+"</a></div></li>");
+								$ul.append($li);
+							}
+        				},
+        				error:function(e){
+        					console.log('error');
+        				}
+					});
+				});
+				function clickPre(){
+					var select=$("ul:visible");
+					if(select.prev().length>0){
+						select.hide();
+						select.prev().fadeIn(2000).show();
+					}
+					return;
+				}
+				function nextWebPage(obj){
+						var img=obj.parentNode.previousSibling.src;
+						var name=obj.title;
+						var num=obj.name;
+						var author=obj.parentNode.nextSibling.children[0].title;
+						var stroge=window.localStorage;
+						stroge.setItem('img',img);
+						stroge.setItem('name',name);
+						stroge.setItem('author',author);
+						stroge.setItem('num',num);
+					}
+				function clickEvent(){    
+					var select=$("ul:visible");
+					if(select.next().text().length>0){
+						select.hide();
+						select.next().fadeIn(2000).show();
+						return;
+					}else{
+						select.hide();
+						$.get("file/song_sheet_info.txt",function(data){
+							var arr=data.split("\n");
+							var l=$(".songSheetInfo ul:last").attr("name");
+							var l=parseInt(l)+1;
+							var $ul=$("<ul class='ul"+l+"' name='"+l+"'></ul>");
+							$(".songSheetInfo").append($ul);
+							var num=0;
+							for(var i=(l-1)*16;i<arr.length;i++){
+								num++;
+								if(num<=16){
+									var arr1=arr[i].split("\t");
+									var $li=$("<li><img src='"+arr1[1]+"' /><div><a target='_blank' onclick='nextWebPage(this)' class='descript_song' title='"+arr1[2]+"' name='"+arr1[0]+"' href='songBySheet.html'><div>"+arr1[2]+"</div></a></div><div>by:<a title='"+arr1[4]+"' href='"+arr1[5]+"'>"+arr1[4]+"</a></div></li>");
+									$ul.append($li);
+									$ul.fadeIn(4000);
+								}else{
+									return;
+								}
+								
+							}
+						});
+					}
+					
+				}
+				
+			</script>
+			<div class="songS_w">
+				<div class="songSheetInfo">
+				</div>
+				<div class="pre">
+					<a href="#" onclick="clickPre()">上一页</a>
+				</div>
+				<div class="next">
+					<a href="#" onclick="clickEvent()">下一页</a>
+				</div>
+			</div>
+			
+		</article>
+	</body>
+</html>
